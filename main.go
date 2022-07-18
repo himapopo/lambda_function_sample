@@ -1,36 +1,31 @@
 package main
 
 import (
-	"encoding/json"
+	"lambda_function_sample/infra/db"
+	"lambda_function_sample/interface/dynamodbrepository"
+	"lambda_function_sample/usecase"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Req struct {
-	Text string `json:"text"`
+type Item struct {
+	UserID    int    `json:"user_id" dynamodbav:"user_id"`
+	LastName  string `json:"last_name" dynamodbav:"last_name"`
+	FirstName string `json:"first_name" dynamodbav:"first_name"`
 }
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var req Req
-	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-		}, err
-	}
-	req.Text += "World"
-
-	b, err := json.Marshal(req)
+	dynamoDB, err := db.NewDynamoDB()
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
+			Body: err.Error(),
 		}, err
 	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       string(b),
-	}, nil
+	
+	userRepository := dynamodbrepository.NewUserDynamoDBRepository(dynamoDB)
+	userUsecase := usecase.NewUserUsecase(userRepository)
+	return userUsecase.Create(request)
 }
 
 func main() {
