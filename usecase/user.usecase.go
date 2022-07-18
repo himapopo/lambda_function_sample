@@ -46,7 +46,6 @@ func (u *userUsecase) Create(request events.APIGatewayProxyRequest) (events.APIG
 	b, err := json.Marshal(item)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
 			Body:       err.Error(),
 		}, err
 	}
