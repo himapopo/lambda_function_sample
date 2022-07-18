@@ -6,6 +6,7 @@ import (
 )
 
 func NewDynamoDB() (*dynamodb.DynamoDB, error) {
+	// DB接続
 	sess, err := session.NewSession()
 	if err != nil {
 		return nil, err

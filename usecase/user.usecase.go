@@ -23,18 +23,21 @@ func NewUserUsecase(userDynamodbRepository dynamodbrepository.UserDynamoDBReposi
 }
 
 func (u *userUsecase) Create(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// リクエストボディをItem構造体に変換
 	var item dynamodbmodel.UserItem
 	if err := json.Unmarshal([]byte(request.Body), &item); err != nil {
 		return events.APIGatewayProxyResponse{
 			Body: err.Error(),
 		}, err
 	}
+	// Item構造体をデータ挿入用の構造体に変換
 	input, err := u.userDynamodbRepository.ConvertPutItem(item)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			Body: err.Error(),
 		}, nil
 	}
+	// データ作成
 	if _, err := u.userDynamodbRepository.PutItem(input); err != nil {
 		return events.APIGatewayProxyResponse{
 			Body: err.Error(),

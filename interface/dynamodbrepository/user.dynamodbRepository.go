@@ -24,10 +24,12 @@ func NewUserDynamoDBRepository(db *dynamodb.DynamoDB) UserDynamoDBRepository {
 }
 
 func (r *userDynamoDBRepository) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	// データ挿入
 	return r.dynamoDB.PutItem(input)
 }
 
 func (r *userDynamoDBRepository) ConvertPutItem(item dynamodbmodel.UserItem) (*dynamodb.PutItemInput, error) {
+	// Itemをデータ挿入用の構造体に変換
 	inputAV, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		return nil, err
